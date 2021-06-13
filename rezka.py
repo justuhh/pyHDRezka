@@ -12,6 +12,9 @@ from re import match, IGNORECASE
 disable_warnings()
 
 
+base_url = 'http://rezkery.com/'
+
+
 def get_session() -> Session:
     session = Session()
     session.verify = False
@@ -111,7 +114,7 @@ class SeriesPage:
             req_data['season'] = season
             req_data['episode'] = episode_id
 
-            _data = self._session.post('https://rezka.ag/ajax/get_cdn_series/', data=req_data, params={'t': int(time()*1000)}).json()
+            _data = self._session.post('{}ajax/get_cdn_series/'.format(base_url), data=req_data, params={'t': int(time()*1000)}).json()
             data = parse_urls(_data['url'].replace('\\', ''))
             episodes.append(Episode(self.title, season, episode_id, data))
 
@@ -181,7 +184,7 @@ class FilmsPage:
 
         print(self._page.find_all('script', text='stream.voidboost.in'))
 
-        _data = self._session.post('https://rezka.ag/ajax/get_cdn_series/', data=req_data, params={'t': int(time()*1000)}).json()
+        _data = self._session.post('{}ajax/get_cdn_series/'.format(base_url), data=req_data, params={'t': int(time()*1000)}).json()
 
         print(_data)
 
@@ -206,7 +209,7 @@ def get_object_data(url: str) -> SeriesPage:
     about = page.find('div', class_='b-post__description_text')
     about = about.text if about else None
     preview_url = page.find('div', class_='b-sidecover').a.img['src']
-    _trailer = session.post('https://rezka.ag/engine/ajax/gettrailervideo.php', data={'id': id}).json()
+    _trailer = session.post('{}engine/ajax/gettrailervideo.php'.format(base_url), data={'id': id}).json()
 
     if _trailer.get('code'):
         trailer_url = BeautifulSoup(_trailer['code'], 'html.parser').iframe['src']
@@ -224,7 +227,7 @@ def search(query: str):
 
     results = []
 
-    req = session.get('https://rezka.ag/search/', params={'do': 'search', 'subaction': 'search', 'q': query})
+    req = session.get('{}search/'.format(base_url), params={'do': 'search', 'subaction': 'search', 'q': query})
 
     bs = BeautifulSoup(req.text, 'html.parser')
 
